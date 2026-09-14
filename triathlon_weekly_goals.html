@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>주간 훈련 목표</title>
+<style>
+  :root{
+    --bg:#EDF1F2; --surface:#FFFFFF; --ink:#16222C; --ink-2:#5D7079; --ink-3:#93A3AB;
+    --line:#D2DBDF;
+    --swim:#1F7A93; --bike:#C8761E; --run:#A63B4C; --soccer:#4A6B4F;
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
+    font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+    font-variant-numeric:tabular-nums;
+  }
+  main{max-width:560px;margin:0 auto;padding:20px 16px 56px}
+
+  .weekbar{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+  .weekbar .mid{flex:1;text-align:center}
+  .weekbar h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.02em}
+  .weekbar p{margin:2px 0 0;font-size:13px;color:var(--ink-2)}
+  .navbtn{width:40px;height:40px;flex:none;border:1px solid var(--line);background:var(--surface);
+    border-radius:50%;font-size:20px;line-height:1;color:var(--ink);cursor:pointer}
+  .navbtn:active{background:#E4EAEC}
+
+  .hero{background:var(--surface);border-radius:var(--r);padding:20px 18px 16px;margin-bottom:14px}
+  .total{display:flex;align-items:baseline;gap:8px}
+  .total b{font-size:36px;font-weight:700;letter-spacing:-.03em;line-height:1}
+  .total span{font-size:15px;color:var(--ink-2)}
+  .sub{margin:6px 0 16px;font-size:13px;color:var(--ink-2)}
+  .ratio{display:flex;height:14px;border-radius:7px;overflow:hidden;background:#E2E8EA}
+  .ratio i{display:block;transition:width .25s ease}
+  .ratio .empty{width:100%;background:repeating-linear-gradient(115deg,#E2E8EA 0 6px,#DAE2E4 6px 12px)}
+  .legend{list-style:none;display:flex;margin:12px 0 0;padding:0;gap:12px;flex-wrap:wrap}
+  .legend li{font-size:13px;color:var(--ink-2);display:flex;align-items:center;gap:6px}
+  .legend em{width:9px;height:9px;border-radius:2px;display:block}
+  .legend b{color:var(--ink);font-weight:600}
+
+  .floors{background:var(--surface);border-radius:var(--r);padding:14px 16px;margin-bottom:16px}
+  .floors h3{margin:0 0 4px;font-size:14px;font-weight:600}
+  .floors p{margin:0 0 10px;font-size:12.5px;color:var(--ink-3)}
+  .floors ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+  .floors li{display:flex;align-items:center;gap:8px;font-size:13.5px}
+  .floors li em{width:9px;height:9px;border-radius:2px;flex:none}
+  .floors li span{margin-left:auto;font-weight:600;font-size:12.5px}
+  .ok{color:#2E7D4F} .no{color:var(--run)}
+
+  .picker{margin-bottom:16px}
+  .picker h3{margin:0 0 8px;font-size:14px;font-weight:600}
+  .chips{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .chips button{flex:none;padding:9px 14px;border:1px solid var(--line);background:var(--surface);
+    border-radius:999px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer;white-space:nowrap}
+  .chips button:active{background:#E4EAEC}
+  .chips button.peak{border-color:var(--run);color:var(--run)}
+
+  .lane{background:var(--surface);border-radius:var(--r);margin-bottom:12px;padding:16px 16px 14px;
+    border-left:5px solid var(--c)}
+  .lane h2{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:baseline;gap:8px}
+  .lane h2 span{font-size:13px;font-weight:500;color:var(--ink-2);margin-left:auto}
+  .row{display:flex;align-items:center;gap:10px;margin-top:12px}
+  .row>label{width:44px;flex:none;font-size:13px;color:var(--ink-2)}
+  .field{flex:1;display:flex;align-items:center;gap:6px;border:1px solid var(--line);
+    border-radius:10px;padding:0 12px;height:44px;background:#FAFCFC}
+  .field input{width:100%;min-width:0;border:0;background:transparent;font:inherit;font-size:17px;
+    font-weight:600;color:var(--ink);text-align:right;padding:0;font-variant-numeric:tabular-nums}
+  .field input:focus{outline:none}
+  .field:focus-within{border-color:var(--c);box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 22%,transparent)}
+  .field u{text-decoration:none;font-size:13px;color:var(--ink-2);flex:none}
+  .twin{display:flex;gap:8px;flex:1}
+  .stepper{display:flex;align-items:center;gap:4px;flex:1;justify-content:flex-end}
+  .stepper button{width:38px;height:38px;border:1px solid var(--line);background:var(--surface);
+    border-radius:9px;font-size:19px;line-height:1;color:var(--ink);cursor:pointer}
+  .stepper button:active{background:#E4EAEC}
+  .stepper output{min-width:62px;text-align:center;font-size:16px;font-weight:600}
+  .perday{margin:10px 0 0;font-size:12px;color:var(--ink-3);text-align:right;min-height:18px}
+
+  .foot{margin-top:20px;display:flex;flex-direction:column;gap:10px}
+  .ghost{padding:13px;border:1px solid var(--line);background:transparent;border-radius:11px;
+    font:inherit;font-size:14px;color:var(--ink);cursor:pointer}
+  .ghost:active{background:#E4EAEC}
+  .status{margin:0;text-align:center;font-size:12.5px;color:var(--ink-3);min-height:19px}
+  .status.warn{color:var(--run)}
+  :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <div class="weekbar">
+    <button class="navbtn" id="prevW" aria-label="이전 주">‹</button>
+    <div class="mid"><h1 id="weekLabel">이번 주</h1><p id="weekRange"></p></div>
+    <button class="navbtn" id="nextW" aria-label="다음 주">›</button>
+  </div>
+
+  <section class="hero">
+    <div class="total"><b id="totalTime">0분</b><span>주간 목표 시간</span></div>
+    <p class="sub" id="totalSub">아래에서 주차를 고르거나 직접 입력하세요.</p>
+    <div class="ratio" id="ratioBar"><i class="empty"></i></div>
+    <ul class="legend" id="legend"></ul>
+  </section>
+
+  <section class="floors">
+    <h3>상시 하한선</h3>
+    <p>이 셋이 무너지면 하프 준비 기간이 6주보다 길어집니다.</p>
+    <ul id="floorList"></ul>
+  </section>
+
+  <section class="picker">
+    <h3>주차 불러오기</h3>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <div id="lanes"></div>
+
+  <div class="foot">
+    <button class="ghost" id="copyPrev">지난 주 목표 그대로 가져오기</button>
+    <p class="status" id="status"></p>
+  </div>
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  var DISC = [
+    { id:"swim",   name:"수영",   unit:"m",  hex:"#1F7A93", floor:"연속 1,500m",   fdist:1500 },
+    { id:"bike",   name:"자전거", unit:"km", hex:"#C8761E", floor:"90분 지속 주행", fmin:90 },
+    { id:"run",    name:"러닝",   unit:"km", hex:"#A63B4C", floor:"10km",          fdist:10 },
+    { id:"soccer", name:"축구",   unit:"km", hex:"#4A6B4F" }
+  ];
+
+  // 목/일 저녁 축구 2회, 금 아침 러닝 8~10km 고정 기준
+  var PRESETS = [
+    { label:"평소 기본", peak:false, d:{
+        swim:{dist:3500,h:1,m:30,n:2}, bike:{dist:70,h:2,m:30,n:2},
+        run:{dist:13,h:1,m:10,n:2},    soccer:{dist:13,h:4,m:0,n:2} } },
+    { label:"하프 D-6", peak:false, d:{
+        swim:{dist:3500,h:1,m:25,n:2}, bike:{dist:85,h:2,m:40,n:2},
+        run:{dist:22,h:2,m:10,n:2},    soccer:{dist:13,h:4,m:0,n:2} } },
+    { label:"하프 D-5", peak:false, d:{
+        swim:{dist:4000,h:1,m:35,n:2}, bike:{dist:100,h:3,m:10,n:2},
+        run:{dist:24,h:2,m:22,n:2},    soccer:{dist:13,h:4,m:0,n:2} } },
+    { label:"하프 D-4", peak:false, d:{
+        swim:{dist:4500,h:1,m:45,n:3}, bike:{dist:110,h:3,m:35,n:2},
+        run:{dist:26,h:2,m:35,n:2},    soccer:{dist:13,h:4,m:0,n:2} } },
+    { label:"하프 D-3 회복", peak:false, d:{
+        swim:{dist:3000,h:1,m:10,n:2}, bike:{dist:55,h:2,m:0,n:2},
+        run:{dist:10,h:0,m:55,n:1},    soccer:{dist:13,h:4,m:0,n:2} } },
+    { label:"하프 D-2 피크", peak:true, d:{
+        swim:{dist:5000,h:1,m:55,n:3}, bike:{dist:125,h:4,m:0,n:2},
+        run:{dist:28,h:2,m:48,n:2},    soccer:{dist:6,h:2,m:0,n:1} } },
+    { label:"하프 D-1 테이퍼", peak:false, d:{
+        swim:{dist:3000,h:1,m:10,n:2}, bike:{dist:50,h:1,m:40,n:2},
+        run:{dist:10,h:1,m:10,n:2},    soccer:{dist:6,h:2,m:0,n:1} } }
+  ];
+
+  var offset = 0, state = blank(), saveTimer = null, loadedKey = null;
+
+  function blank(){
+    var o = {};
+    DISC.forEach(function(d){ o[d.id] = { dist:0, h:0, m:0, n:0 }; });
+    return o;
+  }
+
+  function mondayOf(d){
+    var x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
+    return x;
+  }
+  function weekStart(off){ var m = mondayOf(new Date()); m.setDate(m.getDate() + off*7); return m; }
+  function isoWeek(d){
+    var t = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    t.setDate(t.getDate() + 3 - ((t.getDay() + 6) % 7));
+    var f = new Date(t.getFullYear(), 0, 4);
+    f.setDate(f.getDate() + 3 - ((f.getDay() + 6) % 7));
+    return { year:t.getFullYear(), week: 1 + Math.round((t - f) / 604800000) };
+  }
+  function keyFor(off){
+    var iw = isoWeek(weekStart(off));
+    return "tri:week:" + iw.year + "-W" + String(iw.week).padStart(2,"0");
+  }
+  function fmtRange(off){
+    var a = weekStart(off), b = new Date(a); b.setDate(b.getDate()+6);
+    return (a.getMonth()+1)+"월 "+a.getDate()+"일 – "+(b.getMonth()+1)+"월 "+b.getDate()+"일 · "+isoWeek(a).week+"주차";
+  }
+  function weekName(off){
+    if(off===0) return "이번 주"; if(off===1) return "다음 주"; if(off===-1) return "지난 주";
+    return off>0 ? off+"주 후" : Math.abs(off)+"주 전";
+  }
+  function minsOf(d){ return (d.h|0)*60 + (d.m|0); }
+  function fmtMin(t){
+    t = Math.round(t); if(t<=0) return "0분";
+    var h = Math.floor(t/60), m = t%60;
+    return !h ? m+"분" : (!m ? h+"시간" : h+"시간 "+m+"분");
+  }
+  function num(v,max){
+    v = parseFloat(String(v).replace(/[^0-9.]/g,""));
+    if(!isFinite(v)||v<0) v=0; if(max!=null&&v>max) v=max;
+    return v;
+  }
+
+  /* lanes */
+  var lanesEl = document.getElementById("lanes");
+  DISC.forEach(function(d){
+    var el = document.createElement("section");
+    el.className = "lane"; el.style.setProperty("--c", d.hex);
+    el.innerHTML =
+      '<h2>'+d.name+'<span data-sum="'+d.id+'"></span></h2>'+
+      '<div class="row"><label for="'+d.id+'-dist">거리</label>'+
+        '<div class="field"><input id="'+d.id+'-dist" inputmode="decimal" data-f="dist" data-d="'+d.id+'" value="0"><u>'+d.unit+'</u></div></div>'+
+      '<div class="row"><label for="'+d.id+'-h">시간</label><div class="twin">'+
+        '<div class="field"><input id="'+d.id+'-h" inputmode="numeric" data-f="h" data-d="'+d.id+'" value="0"><u>시간</u></div>'+
+        '<div class="field"><input id="'+d.id+'-m" inputmode="numeric" data-f="m" data-d="'+d.id+'" value="0"><u>분</u></div>'+
+      '</div></div>'+
+      '<div class="row"><label>횟수</label><div class="stepper">'+
+        '<button type="button" data-n="-1" data-d="'+d.id+'" aria-label="'+d.name+' 횟수 줄이기">−</button>'+
+        '<output data-out="'+d.id+'">주 0회</output>'+
+        '<button type="button" data-n="1" data-d="'+d.id+'" aria-label="'+d.name+' 횟수 늘리기">+</button>'+
+      '</div></div>'+
+      '<p class="perday" data-per="'+d.id+'"></p>';
+    lanesEl.appendChild(el);
+  });
+
+  /* preset chips */
+  var chips = document.getElementById("chips");
+  PRESETS.forEach(function(p,i){
+    var b = document.createElement("button");
+    b.type="button"; b.textContent=p.label; b.dataset.i=i;
+    if(p.peak) b.className="peak";
+    chips.appendChild(b);
+  });
+  chips.addEventListener("click", function(e){
+    var b = e.target.closest("button[data-i]"); if(!b) return;
+    var p = PRESETS[+b.dataset.i];
+    state = blank();
+    Object.keys(p.d).forEach(function(k){ state[k] = Object.assign({}, p.d[k]); });
+    render(); save();
+  });
+
+  /* floors */
+  function renderFloors(){
+    var ul = document.getElementById("floorList"); ul.innerHTML="";
+    DISC.filter(function(d){ return d.floor; }).forEach(function(d){
+      var s = state[d.id], per = s.n>0 ? (d.fdist ? s.dist/s.n : minsOf(s)/s.n) : 0;
+      var target = d.fdist || d.fmin, met = per >= target*0.98;
+      var li = document.createElement("li");
+      var shown = d.fdist
+        ? (d.id==="swim" ? Math.round(per).toLocaleString()+"m" : (Math.round(per*10)/10)+"km")
+        : Math.round(per)+"분";
+      li.innerHTML = '<em style="background:'+d.hex+'"></em>'+d.name+' — '+d.floor+
+        '<span class="'+(met?"ok":"no")+'">'+(s.n>0 ? (met?"충족 ":"부족 ")+shown : "—")+'</span>';
+      ul.appendChild(li);
+    });
+  }
+
+  function render(){
+    document.getElementById("weekLabel").textContent = weekName(offset);
+    document.getElementById("weekRange").textContent = fmtRange(offset);
+
+    var total = 0, tri = 0;
+    DISC.forEach(function(d){
+      total += minsOf(state[d.id]);
+      if(d.id!=="soccer") tri += minsOf(state[d.id]);
+    });
+    document.getElementById("totalTime").textContent = fmtMin(total);
+
+    DISC.forEach(function(d){
+      var s = state[d.id];
+      var set = function(id,v){ var e=document.getElementById(id); if(e!==document.activeElement) e.value=v; };
+      set(d.id+"-dist", s.dist); set(d.id+"-h", s.h); set(d.id+"-m", s.m);
+      document.querySelector('[data-out="'+d.id+'"]').textContent = "주 "+s.n+"회";
+      document.querySelector('[data-sum="'+d.id+'"]').textContent =
+        (s.dist>0||minsOf(s)>0) ? (s.dist>0 ? s.dist.toLocaleString()+d.unit+" · " : "")+fmtMin(minsOf(s)) : "";
+      var per = document.querySelector('[data-per="'+d.id+'"]');
+      if(s.n>0 && (s.dist>0||minsOf(s)>0)){
+        var pd = s.dist>0 ? (Math.round(s.dist/s.n*10)/10).toLocaleString()+d.unit : "";
+        var pt = minsOf(s)>0 ? fmtMin(minsOf(s)/s.n) : "";
+        per.textContent = "1회 평균 "+[pd,pt].filter(Boolean).join(" / ");
+      } else per.textContent="";
+    });
+
+    var bar=document.getElementById("ratioBar"), legend=document.getElementById("legend"),
+        sub=document.getElementById("totalSub");
+    bar.innerHTML=""; legend.innerHTML="";
+    if(total<=0){
+      bar.innerHTML='<i class="empty"></i>';
+      sub.textContent="아래에서 주차를 고르거나 직접 입력하세요.";
+    } else {
+      DISC.forEach(function(d){
+        var mn=minsOf(state[d.id]);
+        if(mn>0){
+          var i=document.createElement("i");
+          i.style.width=(mn/total*100)+"%"; i.style.background=d.hex; bar.appendChild(i);
+        }
+        var li=document.createElement("li");
+        li.innerHTML='<em style="background:'+d.hex+'"></em>'+d.name+' <b>'+Math.round(mn/total*100)+'%</b>';
+        legend.appendChild(li);
+      });
+      sub.textContent = "3종 "+fmtMin(tri)+" · 축구 제외";
+    }
+    renderFloors();
+  }
+
+  function setStatus(m,w){
+    var el=document.getElementById("status"); el.textContent=m; el.className="status"+(w?" warn":"");
+  }
+  function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(save,600); }
+  function save(){
+    var key=keyFor(offset);
+    window.storage.set(key, JSON.stringify({v:2,savedAt:new Date().toISOString(),data:state}))
+      .then(function(r){ setStatus(r?"저장됨":"저장하지 못했습니다. 다시 입력해 보세요.", !r); })
+      .catch(function(){ setStatus("저장하지 못했습니다. 다시 입력해 보세요.", true); });
+  }
+  function apply(p){
+    state=blank();
+    if(p && p.data) DISC.forEach(function(d){
+      if(p.data[d.id]) state[d.id]=Object.assign(blank()[d.id], p.data[d.id]);
+    });
+  }
+  function loadWeek(){
+    var key=keyFor(offset); loadedKey=key; setStatus("불러오는 중…");
+    window.storage.get(key).then(function(r){
+      if(loadedKey!==key) return;
+      state=blank();
+      if(r&&r.value){
+        try{ apply(JSON.parse(r.value)); }catch(e){}
+        setStatus("저장된 목표를 불러왔습니다.");
+      } else setStatus("아직 목표가 없는 주입니다.");
+      render();
+    }).catch(function(){
+      if(loadedKey!==key) return;
+      state=blank(); setStatus("아직 목표가 없는 주입니다."); render();
+    });
+  }
+
+  document.getElementById("prevW").addEventListener("click",function(){ offset--; loadWeek(); render(); });
+  document.getElementById("nextW").addEventListener("click",function(){ offset++; loadWeek(); render(); });
+
+  lanesEl.addEventListener("input",function(e){
+    var t=e.target; if(t.tagName!=="INPUT") return;
+    var d=t.dataset.d,f=t.dataset.f;
+    if(f==="dist") state[d].dist=num(t.value,999999);
+    if(f==="h") state[d].h=num(t.value,40);
+    if(f==="m") state[d].m=num(t.value,59);
+    render(); scheduleSave();
+  });
+  lanesEl.addEventListener("click",function(e){
+    var b=e.target.closest("button[data-n]"); if(!b) return;
+    var d=b.dataset.d;
+    state[d].n=Math.max(0,Math.min(21,state[d].n+parseInt(b.dataset.n,10)));
+    render(); scheduleSave();
+  });
+  document.getElementById("copyPrev").addEventListener("click",function(){
+    var key=keyFor(offset-1); setStatus("지난 주 목표를 찾는 중…");
+    window.storage.get(key).then(function(r){
+      if(!r||!r.value){ setStatus("지난 주에 저장된 목표가 없습니다.",true); return; }
+      apply(JSON.parse(r.value)); render(); save();
+    }).catch(function(){ setStatus("지난 주에 저장된 목표가 없습니다.",true); });
+  });
+
+  render(); loadWeek();
+})();
+</script>
+</body>
+</html>
